@@ -1,0 +1,5 @@
+json_files/
+build/
+dist/
+venv/
+moviepy-master/

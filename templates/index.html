@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form with Dynamic Number Ranges and Stats</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-light">
+    <div class="container mt-2 mb-2">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <!-- Bootstrap form container without overflow-auto -->
+          <div class="border p-4 rounded">
+            <form action="/submit" method="POST">
+              <h2 class="text-center mb-4">Submit your Details</h2>
+
+              <!-- YT Link -->
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="yt_link"
+                  name="yt_link"
+                  placeholder="YT Link"
+                  value="{{ yt_link }}"
+                  required
+                />
+                <label for="yt_link">YT LINK</label>
+              </div>
+
+              <!-- Team 1 -->
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="t1"
+                  name="t1"
+                  placeholder="Team 1"
+                  value="{{ t1 }}"
+                  required
+                />
+                <label for="t1">Team 1</label>
+              </div>
+
+              <!-- Team 2 -->
+              <div class="form-floating mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="t2"
+                  name="t2"
+                  placeholder="Team 2"
+                  value="{{ t2 }}"
+                  required
+                />
+                <label for="t2">Team 2</label>
+              </div>
+
+              {% if error_stat %}
+              <div class="alert alert-danger" role="alert">
+                {{ error_stat }}
+              </div>
+              {% endif %}
+
+              <!-- Stats -->
+              <div class="form-floating mb-3">
+                <div id="stats-group">
+                  {% if stats %} {% for stat in stats %}
+                  <div class="input-group mb-2">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="stats[]"
+                      placeholder="Stat"
+                      value="{{ stat }}"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm delete-stat-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  {% endfor %} {% else %}
+                  <!-- Default single empty stat input -->
+                  <div class="input-group mb-2">
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="stats[]"
+                      placeholder="Stat"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm delete-stat-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="add-stat-btn"
+                  >
+                    Add More Stats
+                  </button>
+                </div>
+              </div>
+
+              {% if error_language %}
+              <div class="alert alert-danger" role="alert">
+                {{ error_language }}
+              </div>
+              {% endif %}
+
+              <!-- Languages -->
+              <div class="mb-3">
+                <label class="form-label">Select Languages:</label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="italian"
+                  name="languages" value="it" {% if "it" in languages %} checked
+                  {% endif %} />
+                  <label class="form-check-label" for="italian">Italian</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="english"
+                  name="languages" value="en" {% if "en" in languages %} checked
+                  {% endif %} />
+                  <label class="form-check-label" for="english">English</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="spanish"
+                  name="languages" value="es" {% if "es" in languages %} checked
+                  {% endif %} />
+                  <label class="form-check-label" for="spanish">Spanish</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="polish"
+                  name="languages" value="pl" {% if "pl" in languages %} checked
+                  {% endif %} />
+                  <label class="form-check-label" for="polish">Polish</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="german"
+                  name="languages" value="de" {% if "de" in languages %} checked
+                  {% endif %} />
+                  <label class="form-check-label" for="german">German</label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="french"
+                  name="languages" value="fr" {% if "fr" in languages %} checked
+                  {% endif %} />
+                  <label class="form-check-label" for="french">French</label>
+                </div>
+              </div>
+
+              {% if error %}
+              <div class="alert alert-danger" role="alert">{{ error }}</div>
+              {% endif %}
+
+              <!-- Dynamic Number Range Section -->
+              <div class="mb-3">
+                <label class="form-label"
+                  >Specify Ranges where you want your video to be cut and
+                  saved:</label
+                >
+                <div id="number-range-group">
+                  {% if ranges %} {% for min_val, max_val in ranges %}
+                  <div class="input-group mb-2">
+                    <input
+                      type="number"
+                      class="form-control"
+                      name="number_min[]"
+                      placeholder="Min"
+                      value="{{ min_val }}"
+                      required
+                    />
+                    <input
+                      type="number"
+                      class="form-control"
+                      name="number_max[]"
+                      placeholder="Max"
+                      value="{{ max_val }}"
+                      required
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm delete-range-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  {% endfor %} {% else %}
+                  <!-- Default single empty range input -->
+                  <div class="input-group mb-2">
+                    <input
+                      type="number"
+                      class="form-control"
+                      name="number_min[]"
+                      placeholder="Min"
+                    />
+                    <input
+                      type="number"
+                      class="form-control"
+                      name="number_max[]"
+                      placeholder="Max"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-danger btn-sm delete-range-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  {% endif %}
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button
+                    type="button"
+                    class="btn btn-secondary"
+                    id="add-range-btn"
+                  >
+                    Add More Ranges
+                  </button>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS and Popper.js (optional) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript to handle adding new stats and number ranges -->
+    <script>
+      // Function to add new stats
+      function addStat() {
+        var newStatGroup = document.createElement("div");
+        newStatGroup.classList.add("input-group", "mb-2");
+
+        var statInput = document.createElement("input");
+        statInput.setAttribute("type", "text");
+        statInput.setAttribute("name", "stats[]");
+        statInput.setAttribute("placeholder", "Stat");
+        statInput.classList.add("form-control");
+        statInput.required = true;
+
+        var deleteButton = document.createElement("button");
+        deleteButton.setAttribute("type", "button");
+        deleteButton.classList.add(
+          "btn",
+          "btn-danger",
+          "btn-sm",
+          "delete-stat-btn"
+        );
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", function () {
+          newStatGroup.remove();
+        });
+
+        newStatGroup.appendChild(statInput);
+        newStatGroup.appendChild(deleteButton);
+        document.getElementById("stats-group").appendChild(newStatGroup);
+      }
+
+      // Function to add new number ranges
+      function addRange() {
+        var newRangeGroup = document.createElement("div");
+        newRangeGroup.classList.add("input-group", "mb-2");
+
+        var minInput = document.createElement("input");
+        minInput.setAttribute("type", "number");
+        minInput.setAttribute("name", "number_min[]");
+        minInput.setAttribute("placeholder", "Min");
+        minInput.classList.add("form-control");
+        minInput.required = true;
+
+        var maxInput = document.createElement("input");
+        maxInput.setAttribute("type", "number");
+        maxInput.setAttribute("name", "number_max[]");
+        maxInput.setAttribute("placeholder", "Max");
+        maxInput.classList.add("form-control");
+        maxInput.required = true;
+
+        var deleteButton = document.createElement("button");
+        deleteButton.setAttribute("type", "button");
+        deleteButton.classList.add(
+          "btn",
+          "btn-danger",
+          "btn-sm",
+          "delete-range-btn"
+        );
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", function () {
+          newRangeGroup.remove();
+        });
+
+        newRangeGroup.appendChild(minInput);
+        newRangeGroup.appendChild(maxInput);
+        newRangeGroup.appendChild(deleteButton);
+        document
+          .getElementById("number-range-group")
+          .appendChild(newRangeGroup);
+      }
+
+      // Adding event listeners for buttons
+      document
+        .getElementById("add-stat-btn")
+        .addEventListener("click", addStat);
+      document
+        .getElementById("add-range-btn")
+        .addEventListener("click", addRange);
+
+      // Initial delete button functionality for existing inputs
+      document.querySelectorAll(".delete-stat-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          btn.parentElement.remove();
+        });
+      });
+
+      document.querySelectorAll(".delete-range-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          btn.parentElement.remove();
+        });
+      });
+    </script>
+  </body>
+</html>
