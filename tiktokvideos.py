@@ -169,7 +169,7 @@ def download_highlights(yt_link):
     ys.download(filename="highlights.mp4")
 
 
-def generate_videos(yt_link, t1, t2, stats, ranges, languages):
+def generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path):
     output_dir = "output_videos"
 
     if not os.path.exists(output_dir):
@@ -233,6 +233,9 @@ def generate_videos(yt_link, t1, t2, stats, ranges, languages):
             clip = clip.crop(y1=y_center, width=new_width, height=new_height)
 
         # clip.write_videofile(f"video_{voice}.mp4", codec="libx264", fps=30)
+        uploaded_video = VideoFileClip(uploaded_video_path)
+        final_clip = concatenate_videoclips([final_clip, uploaded_video])
+
         video_file = os.path.join(output_dir, f"video_{voice}.mp4")
         clip.write_videofile(video_file, codec="libx264", fps=30)
     delete_wav()

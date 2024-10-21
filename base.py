@@ -1,5 +1,11 @@
 from flask import Flask, render_template, request
 from tiktokvideos import generate_videos
+import os
+
+# ---- TO DO ----- 
+# APP CONFIG
+# FIX FEATURE UPLOADING .mp4
+# NEW KEY
 
 app = Flask(__name__)
 # CORS(app)
@@ -17,6 +23,12 @@ def submit_form():
     languages = request.form.getlist('languages')
     languages_str = ', '.join(languages) if languages else 'None selected'
     stats = request.form.getlist('stats[]')
+    video_file = request.files['video_file']
+    
+    if video_file.filename != '':
+        filename = video_file.filename
+        video_path = os.path.join('uploads', filename)
+        video_file.save(video_path)
 
     number_mins = request.form.getlist('number_min[]')
     number_maxs = request.form.getlist('number_max[]')
@@ -47,7 +59,7 @@ def submit_form():
             return render_template('index.html', yt_link=yt_link, t1=t1, t2=t2, stats=stats, languages=languages_str, ranges=ranges, error=error_message)
         else:
             # Success
-            generate_videos(yt_link, t1, t2, stats, ranges, languages)
+            generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path)
             return render_template('submitting.html', yt_link=yt_link, t1=t1, t2=t2, stats=stats, languages=languages_str, ranges=ranges, success="Form submitted successfully!")
 
 

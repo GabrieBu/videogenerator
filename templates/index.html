@@ -15,7 +15,7 @@
         <div class="col-md-6">
           <!-- Bootstrap form container without overflow-auto -->
           <div class="border p-4 rounded">
-            <form action="/submit" method="POST">
+            <form action="/submit" method="POST" enctype="multipart/form-data">
               <h2 class="text-center mb-4">Submit your Details</h2>
 
               <!-- YT Link -->
@@ -166,6 +166,21 @@
               {% if error %}
               <div class="alert alert-danger" role="alert">{{ error }}</div>
               {% endif %}
+
+              <!-- Video File Upload -->
+              <div class="mb-3">
+                <label for="video_file" class="form-label"
+                  >Upload Video File:</label
+                > 
+                <input
+                  class="form-control"
+                  type="file"
+                  id="video_file"
+                  name="video_file"
+                  accept="video/*"
+                  required
+                />
+              </div>
 
               <!-- Dynamic Number Range Section -->
               <div class="mb-3">
