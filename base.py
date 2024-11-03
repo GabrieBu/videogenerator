@@ -24,11 +24,15 @@ def submit_form():
     languages_str = ', '.join(languages) if languages else 'None selected'
     stats = request.form.getlist('stats[]')
     video_file = request.files['video_file']
-    
+    video_position = request.form.get('video_position')
+
+    print(f"Video_file: {video_file}")
     if video_file.filename != '':
         filename = video_file.filename
         video_path = os.path.join('uploads', filename)
         video_file.save(video_path)
+    else:
+        video_path = None
 
     number_mins = request.form.getlist('number_min[]')
     number_maxs = request.form.getlist('number_max[]')
@@ -59,7 +63,7 @@ def submit_form():
             return render_template('index.html', yt_link=yt_link, t1=t1, t2=t2, stats=stats, languages=languages_str, ranges=ranges, error=error_message)
         else:
             # Success
-            generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path)
+            generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path, video_position)
             return render_template('submitting.html', yt_link=yt_link, t1=t1, t2=t2, stats=stats, languages=languages_str, ranges=ranges, success="Form submitted successfully!")
 
 
@@ -81,4 +85,7 @@ def has_intersection(ranges):
     return False
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        app.run(debug=True, port=5001)
+    except Exception as e:
+        print(e)

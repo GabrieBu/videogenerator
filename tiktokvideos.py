@@ -169,7 +169,26 @@ def download_highlights(yt_link):
     ys.download(filename="highlights.mp4")
 
 
-def generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path):
+def crop_clip(clip):
+    width, height = clip.size
+
+    target_aspect_ratio = 9 / 16 
+
+    if width / height > target_aspect_ratio:
+        new_width = int(height * target_aspect_ratio)
+        new_height = height
+        x_center = (width - new_width) / 2
+        clip = clip.crop(x1=x_center, width=new_width, height=new_height)
+    else:
+        new_height = int(width / target_aspect_ratio)
+        new_width = width
+        y_center = (height - new_height) / 2
+        clip = clip.crop(y1=y_center, width=new_width, height=new_height)
+
+    return clip
+
+
+def generate_videos(yt_link, t1, t2, stats, ranges, languages, uploaded_video_path, video_position):
     output_dir = "output_videos"
 
     if not os.path.exists(output_dir):
@@ -190,16 +209,16 @@ def generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path):
                 sum_subclips += (int(range[1]) - int(range[0]))
                 sub_clips.append(sub_clip)
 
-            remaining_time = duration_wav - sum_subclips  # Time left to cover
+            remaining_time = duration_wav - sum_subclips  # time left to cover
 
             if remaining_time > 0:
-                last_end_time = ranges[-1][1]  # End of the last subclip
+                last_end_time = ranges[-1][1]  # end of the last subclip
                 
                 while remaining_time > 0:
                     next_start = last_end_time
-                    next_end = min(next_start + remaining_time, highlights.duration)  # Ensure we don't exceed the video duration
+                    next_end = min(next_start + remaining_time, highlights.duration)  # ensure we don't exceed the video duration
                     if next_start >= highlights.duration:
-                        break  # No more video to cut from
+                        break  # no more video to cut from
 
                     additional_clip = highlights.subclip(int(next_start), int(next_end))
                     sub_clips.append(additional_clip)
@@ -207,37 +226,26 @@ def generate_videos(yt_link, t1, t2, stats, ranges, languages, video_path):
                     sub_duration = next_end - next_start
                     remaining_time -= sub_duration
                     last_end_time = next_end
-            final_clip = concatenate_videoclips(sub_clips)
+            concatenated_clips = concatenate_videoclips(sub_clips)
         else:
-            # if not specifyied take from 0 to second to be covered
-            final_clip = highlights.subclip(0, duration_wav)
+            # if not specified take from 0 to second to be covered
+            concatenated_clips = highlights.subclip(0, duration_wav)
 
-        # audio_background = AudioFileClip('themesong.mp3').subclip(42, 42 + duration_wav)
-        # audio_bg_final = audio_background.volumex(0.18)  # half audio
-        # final_audio = CompositeAudioClip([audio_clip, audio_bg_final])
+        clip = concatenated_clips.with_audio(audio_clip)
+        
+        clip = crop_clip(clip)
 
-        clip = final_clip.with_audio(audio_clip)
-        width, height = clip.size
+        if uploaded_video_path:
+            uploaded_video = VideoFileClip(uploaded_video_path)
+            uploaded_video_cropped = crop_clip(uploaded_video).resize(clip.size)  # Resize to match highlight clip size
+            if video_position == "start":
+                final_clip = concatenate_videoclips([uploaded_video_cropped, clip])
+            else: # only start or end is acceptable
+                final_clip = concatenate_videoclips([clip, uploaded_video_cropped])
 
-        target_aspect_ratio = 9 / 16 
-
-        if width / height > target_aspect_ratio:
-            new_width = int(height * target_aspect_ratio)
-            new_height = height
-            x_center = (width - new_width) / 2
-            clip = clip.crop(x1=x_center, width=new_width, height=new_height)
-        else:
-            new_height = int(width / target_aspect_ratio)
-            new_width = width
-            y_center = (height - new_height) / 2
-            clip = clip.crop(y1=y_center, width=new_width, height=new_height)
-
-        # clip.write_videofile(f"video_{voice}.mp4", codec="libx264", fps=30)
-        uploaded_video = VideoFileClip(uploaded_video_path)
-        final_clip = concatenate_videoclips([final_clip, uploaded_video])
-
+ 
         video_file = os.path.join(output_dir, f"video_{voice}.mp4")
-        clip.write_videofile(video_file, codec="libx264", fps=30)
+        final_clip.write_videofile(video_file, codec="libx264", fps=30)
     delete_wav()
     delete_mp4()
 
