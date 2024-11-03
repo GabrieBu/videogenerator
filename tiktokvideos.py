@@ -194,6 +194,9 @@ def generate_videos(yt_link, t1, t2, stats, ranges, languages, uploaded_video_pa
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    if not os.path.exists("uploads"):
+        os.makedirs("uploads")
+
     download_highlights(yt_link)
     generate_text(stats, t1, t2, languages)
     

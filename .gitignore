@@ -3,3 +3,7 @@ build/
 dist/
 venv/
 moviepy-master/
+output_videos/
+uploads
+__pycache__
+.DS_Store
