@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 from tiktokvideos import generate_videos
 import os
+import webview
 
 # ---- TO DO ----- 
 # APP CONFIG
@@ -8,6 +9,7 @@ import os
 # NEW KEY
 
 app = Flask(__name__)
+window = webview.create_window("FlashbetOfficial", app)
 # CORS(app)
 
 @app.route('/')
@@ -86,6 +88,7 @@ def has_intersection(ranges):
 
 if __name__ == '__main__':
     try:
-        app.run(debug=True, port=5001)
+        # app.run(debug=True, port=5001, use_reloader=False)
+        webview.start()
     except Exception as e:
         print(e)
