@@ -164,10 +164,21 @@ def delete_mp4():
 
 
 def download_highlights(yt_link):
-    yt = YouTube(str(yt_link))
-    print(yt.title)
-    ys = yt.streams.get_highest_resolution()
-    ys.download(filename="highlights.mp4")
+    try:
+        yt = YouTube(yt_link)
+        yt.check_availability()
+        streams = yt.streams.filter(progressive=True)
+        if not streams:
+            print("No progressive streams found, trying other options.")
+            streams = yt.streams.filter(file_extension='mp4')  # As a fallback, any MP4 format
+        
+        if streams:
+            ys = streams.last()
+            ys.download(filename="highlights.mp4")
+        else:
+            print(f"No suitable streams found for video {yt_link}")
+    except:
+        print(f"Video {yt_link} is unavailable.")
 
 
 def crop_clip(clip):
@@ -246,7 +257,8 @@ def generate_videos(yt_link, t1, t2, stats, ranges, languages, uploaded_video_pa
                 final_clip = concatenate_videoclips([uploaded_video_cropped, clip])
             else: # only start or end is acceptable
                 final_clip = concatenate_videoclips([clip, uploaded_video_cropped])
-
+        else:
+            final_clip = clip
  
         video_file = os.path.join(output_dir, f"video_{voice}.mp4")
         final_clip.write_videofile(video_file, codec="libx264", fps=30)
