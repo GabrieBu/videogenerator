@@ -87,7 +87,7 @@ def text_to_wav(voice_name: str, text: str):
 """
 
 def generate_text(stats, t1, t2, languages):
-    genai.configure(api_key="AIzaSyDlf8Pj6H4ww1MsXNGgUMBjSN1o7wCK8zQ")
+    genai.configure(api_key="")
     model = genai.GenerativeModel("gemini-1.5-pro-latest")
     cfg = genai.GenerationConfig(response_mime_type="application/json")
 
