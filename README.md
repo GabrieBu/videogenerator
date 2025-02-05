@@ -6,7 +6,7 @@ VideoGenerator is an AI-powered tool that automates the creation of engaging Tik
 
 - **Frontend**: A simple interface built with HTML and CSS (planned migration to React.js for better performance and scalability).
 - **Script Module**: Handles AI-powered script generation and text-to-speech conversion.
-  - Uses OpenAI API to create engaging TikTok scripts.
+  - Uses Gemini to create engaging TikTok scripts.
   - Passes the generated text to Google's Text-to-Speech AI.
   - Assembles the final video output.
 
